@@ -1,3 +1,4 @@
+#define _USE_MATH_DEFINES
 #include <iostream>
 #include <stdio.h>
 #include <Windows.h>
@@ -84,6 +85,43 @@ void draw_food(float x, float y){
             }
         }
 }  //画食物
+
+// 以下是一些数学函数
+double pg_math_angle_rad(double angle){    //角度转弧度
+    return angle * M_PI / 180.0;
+}
+double pg_math_rad_angle(double rad){    //弧度转角度
+    return rad * 180.0 / M_PI;
+}
+double pg_math_cal_point_angle(int x1, int y1, int x2, int y2){ 
+    double angle = atan2(y2 - y1, x2 - x1) * 180.0 / M_PI;
+    if(angle < 0){
+        angle += 360;
+    }
+    return angle;
+} //计算两点之间的角度
+double pg_math_PointLen(int x1, int y1, int x2, int y2){  //计算两点之间的距离
+    double len = sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+    return len;
+}
+double pg_math_In_Angle_sin(double angle){
+    return sin(pg_math_angle_rad(angle));
+}   //正弦值
+double pg_math_In_Angle_cos(double angle){
+    return cos(pg_math_angle_rad(angle));
+}   //余弦值
+void DrawLine(int x1, int y1, int x2, int y2, int color){  //Bresenham算法
+    double angle = pg_math_cal_point_angle(x1, y1, x2, y2);
+    double LengthEnd = pg_math_PointLen(x1, y1, x2, y2);
+    double Length = 0.0;
+    while (Length < LengthEnd){
+        int x = x1 + Length * pg_math_In_Angle_cos(angle);
+        int y = y1 + Length * pg_math_In_Angle_sin(angle);
+        ege::putpixel(x, y, color);
+        Length += 0.1;
+    }
+}
+//祖传代码上一个项目剩下的，没时间整理了，先放着吧
 class SNAKE
 {
 public:
@@ -107,6 +145,7 @@ public:
         head = &sNode[0];
         head->x = SNAKE_HEAD_X;
         head->y = SNAKE_HEAD_Y;
+        HP = SNAKE_HP;
         switch (dir)
         {
         case RIGHT:
@@ -211,8 +250,9 @@ public:
         }
      }
     void Collision(){  //碰撞检测
-        if(head->x < 0 || head->x > GAME_WINDOW_Width || head->y < 0 || head->y > GAME_WINDOW_Height){
-            GameOver();
+        if(head->x < 0 || head->x > GAME_WINDOW_Width || 
+            head->y < 0 || head->y > GAME_WINDOW_Height){
+            HP -= 10.0f;  // 生命值减少
         }
     }
     void PrintScore(){
@@ -227,6 +267,26 @@ public:
         speed = 2;
     }
     void DrawHP(){
+        const int HP_len = 70;
+        const int HP_height = 10;
+        //画血条边框begin
+        line(GAME_WINDOW_Width - 100 + 2, 50, 
+        GAME_WINDOW_Width - 100 + HP_len, 50);  
+
+        line(GAME_WINDOW_Width - 100 + 2, 50 + HP_height, GAME_WINDOW_Width - 100 + HP_len, 
+        50 + HP_height);
+
+        line(GAME_WINDOW_Width - 100 + 2, 50, 
+        GAME_WINDOW_Width - 100 + 2, 50 + HP_height);
+
+        line(GAME_WINDOW_Width - 100 + HP_len, 50, 
+        GAME_WINDOW_Width - 100 + HP_len, 50 + HP_height);
+        //画血条边框end
+
+        float HP_rate = HP / SNAKE_HP;  // 生命值比率
+        for(int y = 50; y < 50 + HP_height; y++){
+            DrawLine(GAME_WINDOW_Width - 100, y, GAME_WINDOW_Width - 100 + HP_rate * HP_len,y,BGR(0, 0, 255));  //画血条
+        }
         
     }
 };
@@ -272,6 +332,10 @@ class GAME{
                 snake.Draw();
                 snake.Collision();  //碰撞检测
                 snake.PrintScore();//在右上角显示分数
+                snake.DrawHP();  //画生命值
+                if(snake.HP <= 0){
+                    snake.GameOver();
+                }
                 if(GetKey(' ')){
                     snake.FastMove();
                 }
