@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
-
+#include <conio.h>
 using namespace std;
 using namespace ege;
 //#define HELP 
@@ -35,7 +35,7 @@ using namespace ege;
 #define SNAKE_MOVE_DOWN    'S'   // 按键S
 #define SNAKE_HP           100.0  // 贪吃蛇的生命值
 
-#define FOOD_COLOR         BGR(0, 255, 0) // 食物的颜色
+#define FOOD_COLOR         BGR(122, 122, 0) // 食物的颜色
 #define FOOD_WIDTH         20             // 食物的宽度
 
 typedef struct Snake_Node
@@ -180,7 +180,7 @@ public:
         }
     }  //画蛇
     void Move(){
-        if(GetKey(SNAKE_MOVE_LEFT) && dir != RIGHT){
+       if(GetKey(SNAKE_MOVE_LEFT) && dir != RIGHT){
             dir = LEFT;
         }
         if(GetKey(SNAKE_MOVE_RIGHT) && dir != LEFT){
@@ -192,6 +192,7 @@ public:
         if(GetKey(SNAKE_MOVE_DOWN) && dir != UP){
             dir = DOWN;
         }
+    // 移动蛇的头部
         Snake_Node Temp;
         Temp = sNode[0];
         switch (dir){
@@ -221,7 +222,7 @@ public:
         GAME_WINDOW_Height / 2 - 50, "Game Over!"); // 输出文字
 
         outtextxy(GAME_WINDOW_Width / 2 - 100, 
-        GAME_WINDOW_Height / 2 + 50, "Press any key to exit."); // 输出文字
+        GAME_WINDOW_Height / 2 + 50, "Press Esc key to exit."); // 输出文字
 
         char score_str[20];
         sprintf(score_str, "%d", score);
@@ -238,14 +239,15 @@ public:
             if(GetKey(VK_ESCAPE)){
                 exit(0);
             }
-            if(GetKey(VK_RETURN)){
+            if(GetKey(13)){
                 head->x = SNAKE_HEAD_X;
                 head->y = SNAKE_HEAD_Y;
                 len = SNAKE_LEN;
                 dir = SNAKE_DIR;
                 speed = SNAKE_SPEED;
                 score = 0;
-                break;
+                cleanwindow();
+                return;
             }
         }
      }
@@ -285,7 +287,8 @@ public:
 
         float HP_rate = HP / SNAKE_HP;  // 生命值比率
         for(int y = 50; y < 50 + HP_height; y++){
-            DrawLine(GAME_WINDOW_Width - 100, y, GAME_WINDOW_Width - 100 + HP_rate * HP_len,y,BGR(0, 0, 255));  //画血条
+            DrawLine(GAME_WINDOW_Width - 100, y, 
+            GAME_WINDOW_Width - 100 + HP_rate * HP_len,y,BGR(0, 255, 0));  //画血条
         }
         
     }
@@ -322,7 +325,7 @@ class GAME{
                     draw_food(food.x, food.y);  // 画食物
                 }
                 if(distance_len(snake.head->x, snake.head->y, food.x, food.y) < SNAKE_WIDTH){
-                   snake.score++;  // 吃到食物加分
+                   snake.score += 10;  // 吃到食物加分
                    food_quite = false;  // 食物被吃掉
                    snake.len++;  // 蛇长加1
                    food.x = random(0, GAME_WINDOW_Width - FOOD_WIDTH);  // 重新生成食物
@@ -340,7 +343,7 @@ class GAME{
                     snake.FastMove();
                 }
                 else{
-                    snake.speed = 1;
+                    snake.speed = SNAKE_SPEED;
                 }//按空格键加快游戏速度
                 delay(100); // 延时100毫秒
                 cleanwindow(); // 清除窗口4a5eb4deb426e3344b1ce400fedf8e1c77abe6f7
@@ -349,6 +352,7 @@ class GAME{
 };
 int main()
 {
+    cout << "1" << endl;
     GAME game;
     game.game();
     
