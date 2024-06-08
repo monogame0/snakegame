@@ -4,10 +4,11 @@
 #include <graphics.h>
 #include <stdlib.h>
 #include <math.h>
+#include <string.h>
 
 using namespace std;
 using namespace ege;
-
+//#define HELP 
 #define LEFT -1 // 左方向
 #define RIGHT 1 // 右方向
 #define UP 2    // 上方向
@@ -175,8 +176,18 @@ public:
         }
     }
      void GameOver(){
-        outtextxy(GAME_WINDOW_Width / 2 - 100, GAME_WINDOW_Height / 2 - 50, "Game Over!"); // 输出文字
-        outtextxy(GAME_WINDOW_Width / 2 - 100, GAME_WINDOW_Height / 2 + 50, "Press any key to exit."); // 输出文字
+        outtextxy(GAME_WINDOW_Width / 2 - 100, 
+        GAME_WINDOW_Height / 2 - 50, "Game Over!"); // 输出文字
+
+        outtextxy(GAME_WINDOW_Width / 2 - 100, 
+        GAME_WINDOW_Height / 2 + 50, "Press any key to exit."); // 输出文字
+
+        char score_str[20];
+        sprintf(score_str, "%d", score);
+        string str = "Your score: ";//输出得分
+        str += score_str;
+        outtextxy(GAME_WINDOW_Width / 2 - 100, GAME_WINDOW_Height / 2, str.c_str()); // 输出文字
+
         getch(); // 等待用户按键
         exit(0); // 退出程序
     }
@@ -186,9 +197,12 @@ public:
         }
     }
     void PrintScore(){
-        char score_str[10];
+        char score_str[20];
         sprintf(score_str, "%d", score);
-        outtextxy(GAME_WINDOW_Width - 100, 30, score_str); // 输出文字
+        //拼接字符串
+        string str = "Score: ";
+        str += score_str;
+        outtextxy(GAME_WINDOW_Width - 100, 30, str.c_str()); // 输出文字
     }  //输出分数
     void FastMove(void){
         speed = 2;
@@ -200,6 +214,14 @@ class GAME{
         Food food;
     public:
         void game(void){
+            #ifdef HELP
+            cout << "Welcome to Snake Game!" << endl;
+            cout << "Press 'A' to move left, 'D' to move right, 'W' to move up, 'S' to move down, 'Space' to speed up." << endl;
+            cout << "Press 'Esc' to exit." << endl;
+            Sleep(2000); // 等待2秒
+            #endif
+
+            cout << "Game Start!" << endl;
             initgraph(GAME_WINDOW_Width, GAME_WINDOW_Height);// 初始化图形界面
             setcaption(GAME_WINDOW_Title);// 设置窗口标题
             bool food_quite = true;  // 食物是否被吃掉(true表示未被吃掉)
@@ -235,7 +257,7 @@ class GAME{
                     snake.speed = 1;
                 }//按空格键加快游戏速度
                 delay(100); // 延时100毫秒
-                cleanwindow(); // 清除窗口
+                cleanwindow(); // 清除窗口4a5eb4deb426e3344b1ce400fedf8e1c77abe6f7
             }
         }
 };
