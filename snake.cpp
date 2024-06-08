@@ -32,6 +32,7 @@ using namespace ege;
 #define SNAKE_MOVE_RIGHT   'D'   // 按键D
 #define SNAKE_MOVE_UP      'W'   // 按键W
 #define SNAKE_MOVE_DOWN    'S'   // 按键S
+#define SNAKE_HP           100.0  // 贪吃蛇的生命值
 
 #define FOOD_COLOR         BGR(0, 255, 0) // 食物的颜色
 #define FOOD_WIDTH         20             // 食物的宽度
@@ -94,6 +95,7 @@ public:
     int width;// 贪吃蛇的宽度
     int color;// 贪吃蛇的颜色
     int score;// 贪吃蛇的得分
+    float HP;// 贪吃蛇的生命值
     SNAKE()
     {
         len = SNAKE_LEN;
@@ -188,9 +190,26 @@ public:
         str += score_str;
         outtextxy(GAME_WINDOW_Width / 2 - 100, GAME_WINDOW_Height / 2, str.c_str()); // 输出文字
 
-        getch(); // 等待用户按键
-        exit(0); // 退出程序
-    }
+        const char* AgainGame;  //再来一次游戏
+        AgainGame = "Press Enter key to play again."; // 输出文字
+        outtextxy(GAME_WINDOW_Width / 2 - 100, 
+        GAME_WINDOW_Height / 2 + 100, AgainGame); // 输出文字
+
+        while(true){
+            if(GetKey(VK_ESCAPE)){
+                exit(0);
+            }
+            if(GetKey(VK_RETURN)){
+                head->x = SNAKE_HEAD_X;
+                head->y = SNAKE_HEAD_Y;
+                len = SNAKE_LEN;
+                dir = SNAKE_DIR;
+                speed = SNAKE_SPEED;
+                score = 0;
+                break;
+            }
+        }
+     }
     void Collision(){  //碰撞检测
         if(head->x < 0 || head->x > GAME_WINDOW_Width || head->y < 0 || head->y > GAME_WINDOW_Height){
             GameOver();
@@ -206,6 +225,9 @@ public:
     }  //输出分数
     void FastMove(void){
         speed = 2;
+    }
+    void DrawHP(){
+        
     }
 };
 class GAME{
@@ -248,7 +270,7 @@ class GAME{
                 } // 食物与蛇头的距离小于蛇的宽度)
                 snake.Move();
                 snake.Draw();
-                snake.Collision();
+                snake.Collision();  //碰撞检测
                 snake.PrintScore();//在右上角显示分数
                 if(GetKey(' ')){
                     snake.FastMove();
